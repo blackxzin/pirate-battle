@@ -1,0 +1,30 @@
+{
+  "baselineMb": 2.21,
+  "cycles": [
+    {
+      "cycle": 1,
+      "heapMb": 6.63,
+      "canvases": 0
+    },
+    {
+      "cycle": 2,
+      "heapMb": 6.92,
+      "canvases": 0
+    },
+    {
+      "cycle": 3,
+      "heapMb": 6.98,
+      "canvases": 0
+    },
+    {
+      "cycle": 4,
+      "heapMb": 7.06,
+      "canvases": 0
+    },
+    {
+      "cycle": 5,
+      "heapMb": 7.16,
+      "canvases": 0
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "environment": {
+    "webglRenderer": "ANGLE (AMD, AMD Radeon RX 580 2048SP (radeonsi polaris10 ACO), OpenGL 4.6)",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.6943.16 Safari/537.36",
+    "viewport": "1280x720",
+    "devicePixelRatio": 1,
+    "hardwareConcurrency": 12
+  },
+  "config": {
+    "sessionSeconds": 180,
+    "spawnIntervalSeconds": 2,
+    "seed": 11,
+    "playerCannotSink": true
+  },
+  "samples": [
+    {
+      "atSeconds": 2,
+      "averageFps": 59.8,
+      "p95FrameMs": 16.9,
+      "maxEntities": 7,
+      "enemies": 1,
+      "projectiles": 3
+    },
+    {
+      "atSeconds": 18,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 21,
+      "enemies": 7,
+      "projectiles": 6
+    },
+    {
+      "atSeconds": 35,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 28,
+      "enemies": 12,
+      "projectiles": 5
+    },
+    {
+      "atSeconds": 51,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 11,
+      "projectiles": 4
+    },
+    {
+      "atSeconds": 67,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 12,
+      "projectiles": 4
+    },
+    {
+      "atSeconds": 84,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 12,
+      "projectiles": 7
+    },
+    {
+      "atSeconds": 100,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 11,
+      "projectiles": 5
+    },
+    {
+      "atSeconds": 116,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 8,
+      "projectiles": 3
+    },
+    {
+      "atSeconds": 132,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 9,
+      "projectiles": 1
+    },
+    {
+      "atSeconds": 149,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 11,
+      "projectiles": 2
+    },
+    {
+      "atSeconds": 165,
+      "averageFps": 60,
+      "p95FrameMs": 16.9,
+      "maxEntities": 31,
+      "enemies": 12,
+      "projectiles": 1
+    }
+  ],
+  "summary": {
+    "minFps": 59.8,
+    "worstP95": 16.9,
+    "maxEntities": 31
+  }
+}
