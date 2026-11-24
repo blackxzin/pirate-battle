@@ -1,9 +1,9 @@
 {
-  "baselineMb": 2.23,
+  "baselineMb": 2.21,
   "cycles": [
     {
       "cycle": 1,
-      "heapMb": 6.62,
+      "heapMb": 6.63,
       "canvases": 0
     },
     {
@@ -13,17 +13,17 @@
     },
     {
       "cycle": 3,
-      "heapMb": 7.08,
+      "heapMb": 7.1,
       "canvases": 0
     },
     {
       "cycle": 4,
-      "heapMb": 7.07,
+      "heapMb": 7.21,
       "canvases": 0
     },
     {
       "cycle": 5,
-      "heapMb": 7.15,
+      "heapMb": 7.29,
       "canvases": 0
     }
   ]

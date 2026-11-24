@@ -43,25 +43,27 @@ npm run perf:mobile  # Pixel 7 emulation on the GPU, CPU slowed down 4x
 
 ## Results: one 3-minute match
 
+The GPU and mobile runs were repeated after the enemy steering change (commit `169a527`). The CPU-only (SwiftShader) run is from the build before it; that change only adds a few segment tests per enemy per step.
+
 ### GPU (reference): target met
 
 | Time (s) | Avg FPS | p95 frame (ms) | Enemies | Projectiles | Peak entities |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| 2 | 59.8 | 16.9 | 1 | 3 | 7 |
-| 18 | 60.0 | 16.9 | 7 | 6 | 21 |
-| 35 | 60.0 | 16.9 | 12 | 5 | 28 |
-| 51 | 60.0 | 16.9 | 11 | 4 | 31 |
-| 67 | 60.0 | 16.9 | 12 | 4 | 31 |
-| 84 | 60.0 | 16.9 | 12 | 7 | 31 |
-| 100 | 60.0 | 16.9 | 11 | 5 | 31 |
-| 116 | 60.0 | 16.9 | 8 | 3 | 31 |
-| 132 | 60.0 | 16.9 | 9 | 1 | 31 |
-| 149 | 60.0 | 16.9 | 11 | 2 | 31 |
-| 165 | 60.0 | 16.9 | 12 | 1 | 31 |
+| 2 | 59.4 | 16.9 | 1 | 3 | 7 |
+| 18 | 59.9 | 16.8 | 5 | 1 | 18 |
+| 35 | 60.0 | 16.8 | 9 | 3 | 24 |
+| 51 | 60.0 | 16.8 | 11 | 5 | 28 |
+| 67 | 60.0 | 16.8 | 12 | 5 | 29 |
+| 84 | 60.0 | 16.8 | 12 | 8 | 31 |
+| 100 | 60.0 | 16.8 | 12 | 11 | 34 |
+| 116 | 60.0 | 16.8 | 12 | 7 | 34 |
+| 132 | 60.0 | 16.9 | 12 | 8 | 34 |
+| 149 | 60.0 | 16.9 | 12 | 10 | 34 |
+| 165 | 60.0 | 16.9 | 12 | 6 | 34 |
 
-- Minimum average: **59.8 FPS**.
+- Minimum average: **59.4 FPS**, in the first sample, which includes start-up. Every later sample is 59.9 or 60.0.
 - Worst p95: **16.9 ms**, which is one 60 Hz frame.
-- Peak: **31 entities**.
+- Peak: **34 entities**, with the 12-enemy cap reached from 67 s on.
 
 The frame rate is locked to the 60 Hz display rate for the whole match.
 
@@ -75,19 +77,19 @@ The frame rate is locked to the 60 Hz display rate for the whole match.
 
 | Time (s) | Avg FPS | p95 frame (ms) | Enemies | Projectiles | Peak entities |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| 2 | 56.4 | 17.5 | 1 | 2 | 8 |
-| 19 | 59.6 | 17.4 | 6 | 1 | 22 |
-| 35 | 59.8 | 17.4 | 12 | 4 | 27 |
-| 68 | 59.9 | 17.4 | 9 | 4 | 27 |
-| 101 | 59.9 | 17.4 | 11 | 4 | 32 |
-| 135 | 59.9 | 17.4 | 11 | 5 | 32 |
-| 168 | 60.0 | 17.4 | 12 | 7 | 32 |
+| 2 | 54.4 | 17.6 | 1 | 2 | 10 |
+| 19 | 59.3 | 17.5 | 6 | 1 | 18 |
+| 35 | 59.6 | 17.4 | 11 | 4 | 26 |
+| 68 | 59.8 | 17.4 | 10 | 3 | 31 |
+| 102 | 59.9 | 17.4 | 12 | 4 | 33 |
+| 135 | 59.9 | 17.4 | 11 | 2 | 33 |
+| 168 | 59.9 | 17.4 | 11 | 3 | 34 |
 
-Rows are every second sample; all 11 samples are in `perf/combat-profile-gpu-mobile-cpu4x.json`.
+The table shows 7 of the 11 samples; all of them are in `perf/combat-profile-gpu-mobile-cpu4x.json`.
 
-- Only the first sample, which includes start-up, is below 59.6 FPS.
-- Worst p95: **17.5 ms**.
-- Peak: **32 entities**.
+- Only the first sample, which includes start-up, is below 59.3 FPS.
+- Worst p95: **17.6 ms**.
+- Peak: **34 entities**.
 
 The GPU is still the desktop one, so this measures the CPU and pixel-density cost, not a phone GPU.
 
@@ -105,16 +107,16 @@ The simulation runs on fixed 1/60 s steps, so the rules (movement, damage, coold
 
 | | Baseline | Cycle 1 | Cycle 2 | Cycle 3 | Cycle 4 | Cycle 5 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| JS heap after forced GC (MB), GPU | 2.23 | 6.62 | 6.91 | 7.08 | 7.07 | 7.15 |
+| JS heap after forced GC (MB), GPU | 2.21 | 6.63 | 6.91 | 7.10 | 7.21 | 7.29 |
 | JS heap after forced GC (MB), CPU | 2.21 | 6.63 | 6.92 | 6.98 | 7.06 | 7.16 |
-| JS heap after forced GC (MB), mobile emulation | 2.25 | 6.68 | 6.96 | 7.14 | 7.23 | 7.22 |
+| JS heap after forced GC (MB), mobile emulation | 2.25 | 6.69 | 6.98 | 7.17 | 7.25 | 7.35 |
 | Canvases left in the DOM | 0 | 0 | 0 | 0 | 0 | 0 |
 
 - **First cycle (+4.4 MB):** this is a one-off cost:
   - the battle chunk (PixiJS) is loaded;
   - the three atlases are decoded and cached on purpose for later matches;
   - TanStack Query fills its cache.
-- **Cycles 2–5:** the heap grows by about 0.1 MB per cycle and flattens. This is V8 and Pixi warm-up (JIT, shader and pool caches), not a leak. The test fails if growth across the cycles goes over 15 MB.
+- **Cycles 2–5:** the heap grows by 0.3 MB or less per cycle, and less each time. This is V8 and Pixi warm-up (JIT, shader and pool caches), not a leak. The test fails if growth across the cycles goes over 15 MB.
 - **Released on every exit:**
   - each `Application` and canvas (0 canvases after each exit);
   - the listeners (keyboard, blur, visibility), the `ResizeObserver`, the ticker and the timers.

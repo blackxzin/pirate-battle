@@ -3,27 +3,27 @@
   "cycles": [
     {
       "cycle": 1,
-      "heapMb": 6.68,
+      "heapMb": 6.69,
       "canvases": 0
     },
     {
       "cycle": 2,
-      "heapMb": 6.96,
+      "heapMb": 6.98,
       "canvases": 0
     },
     {
       "cycle": 3,
-      "heapMb": 7.14,
+      "heapMb": 7.17,
       "canvases": 0
     },
     {
       "cycle": 4,
-      "heapMb": 7.23,
+      "heapMb": 7.25,
       "canvases": 0
     },
     {
       "cycle": 5,
-      "heapMb": 7.22,
+      "heapMb": 7.35,
       "canvases": 0
     }
   ]

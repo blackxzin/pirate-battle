@@ -17,96 +17,96 @@
   "samples": [
     {
       "atSeconds": 2,
-      "averageFps": 56.4,
-      "p95FrameMs": 17.5,
-      "maxEntities": 8,
+      "averageFps": 54.4,
+      "p95FrameMs": 17.6,
+      "maxEntities": 10,
       "enemies": 1,
       "projectiles": 2
     },
     {
       "atSeconds": 19,
-      "averageFps": 59.6,
-      "p95FrameMs": 17.4,
-      "maxEntities": 22,
+      "averageFps": 59.3,
+      "p95FrameMs": 17.5,
+      "maxEntities": 18,
       "enemies": 6,
       "projectiles": 1
     },
     {
       "atSeconds": 35,
-      "averageFps": 59.8,
+      "averageFps": 59.6,
       "p95FrameMs": 17.4,
-      "maxEntities": 27,
-      "enemies": 12,
+      "maxEntities": 26,
+      "enemies": 11,
       "projectiles": 4
     },
     {
       "atSeconds": 52,
-      "averageFps": 59.8,
+      "averageFps": 59.7,
       "p95FrameMs": 17.4,
-      "maxEntities": 27,
+      "maxEntities": 28,
       "enemies": 11,
       "projectiles": 6
     },
     {
       "atSeconds": 68,
-      "averageFps": 59.9,
+      "averageFps": 59.8,
       "p95FrameMs": 17.4,
-      "maxEntities": 27,
-      "enemies": 9,
-      "projectiles": 4
-    },
-    {
-      "atSeconds": 85,
-      "averageFps": 59.9,
-      "p95FrameMs": 17.3,
-      "maxEntities": 27,
-      "enemies": 12,
+      "maxEntities": 31,
+      "enemies": 10,
       "projectiles": 3
     },
     {
-      "atSeconds": 101,
-      "averageFps": 59.9,
-      "p95FrameMs": 17.4,
-      "maxEntities": 32,
-      "enemies": 11,
-      "projectiles": 4
-    },
-    {
-      "atSeconds": 118,
-      "averageFps": 59.9,
-      "p95FrameMs": 17.4,
+      "atSeconds": 85,
+      "averageFps": 59.8,
+      "p95FrameMs": 17.3,
       "maxEntities": 32,
       "enemies": 10,
       "projectiles": 6
     },
     {
+      "atSeconds": 102,
+      "averageFps": 59.9,
+      "p95FrameMs": 17.4,
+      "maxEntities": 33,
+      "enemies": 12,
+      "projectiles": 4
+    },
+    {
+      "atSeconds": 118,
+      "averageFps": 59.9,
+      "p95FrameMs": 17.5,
+      "maxEntities": 33,
+      "enemies": 11,
+      "projectiles": 4
+    },
+    {
       "atSeconds": 135,
       "averageFps": 59.9,
       "p95FrameMs": 17.4,
-      "maxEntities": 32,
+      "maxEntities": 33,
       "enemies": 11,
-      "projectiles": 5
+      "projectiles": 2
     },
     {
       "atSeconds": 151,
       "averageFps": 59.9,
-      "p95FrameMs": 17.3,
-      "maxEntities": 32,
-      "enemies": 11,
-      "projectiles": 1
+      "p95FrameMs": 17.5,
+      "maxEntities": 34,
+      "enemies": 12,
+      "projectiles": 9
     },
     {
       "atSeconds": 168,
-      "averageFps": 60,
+      "averageFps": 59.9,
       "p95FrameMs": 17.4,
-      "maxEntities": 32,
-      "enemies": 12,
-      "projectiles": 7
+      "maxEntities": 34,
+      "enemies": 11,
+      "projectiles": 3
     }
   ],
   "summary": {
-    "minFps": 56.4,
-    "worstP95": 17.5,
-    "maxEntities": 32
+    "minFps": 54.4,
+    "worstP95": 17.6,
+    "maxEntities": 34
   }
 }
