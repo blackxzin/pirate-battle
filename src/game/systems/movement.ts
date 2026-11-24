@@ -3,6 +3,9 @@ import type { ShipStats } from '../config';
 import { resolveCircleRect } from '../math';
 import type { Ship } from '../types';
 
+/** Share of the speed lost per step when sailing straight into a shore. */
+const SHORE_SPEED_LOSS = 0.4;
+
 export interface Steering {
   /** -1 = turn left, 1 = turn right, 0 = keep heading. */
   readonly turn: number;
@@ -19,15 +22,24 @@ export function applySteering(ship: Ship, stats: ShipStats, steering: Steering, 
   }
 }
 
-/** Pushes the ship out of islands and keeps it inside the arena. */
-export function resolveStaticCollisions(ship: Ship, arena: ArenaDefinition): boolean {
-  let blocked = false;
+/**
+ * Pushes the ship out of islands and keeps it inside the arena. Returns how
+ * head-on the contact was (0 = none or grazing, 1 = straight into the shore),
+ * or null when the ship touched nothing.
+ */
+export function resolveStaticCollisions(ship: Ship, arena: ArenaDefinition): number | null {
+  let impact: number | null = null;
+  const hit = (pushX: number, pushY: number): void => {
+    const length = Math.hypot(pushX, pushY);
+    const headOn = length > 0 ? Math.abs((Math.cos(ship.angle) * pushX + Math.sin(ship.angle) * pushY) / length) : 1;
+    impact = Math.max(impact ?? 0, headOn);
+  };
   for (const island of arena.islands) {
     const push = resolveCircleRect(ship.x, ship.y, ship.radius, island.collider);
     if (push) {
       ship.x += push.x;
       ship.y += push.y;
-      blocked = true;
+      hit(push.x, push.y);
     }
   }
   const minX = ship.radius;
@@ -35,21 +47,25 @@ export function resolveStaticCollisions(ship: Ship, arena: ArenaDefinition): boo
   const maxX = arena.width - ship.radius;
   const maxY = arena.height - ship.radius;
   if (ship.x < minX || ship.x > maxX || ship.y < minY || ship.y > maxY) {
-    ship.x = Math.min(maxX, Math.max(minX, ship.x));
-    ship.y = Math.min(maxY, Math.max(minY, ship.y));
-    blocked = true;
+    const clampedX = Math.min(maxX, Math.max(minX, ship.x));
+    const clampedY = Math.min(maxY, Math.max(minY, ship.y));
+    hit(clampedX - ship.x, clampedY - ship.y);
+    ship.x = clampedX;
+    ship.y = clampedY;
   }
-  return blocked;
+  return impact;
 }
 
 /** Integrates position along the heading and resolves collisions. */
 export function moveShip(ship: Ship, arena: ArenaDefinition, dt: number): void {
   ship.x += Math.cos(ship.angle) * ship.speed * dt;
   ship.y += Math.sin(ship.angle) * ship.speed * dt;
-  ship.blocked = resolveStaticCollisions(ship, arena);
-  if (ship.blocked) {
-    // Scraping against the shore bleeds speed so ships do not grind forever.
-    ship.speed *= 0.6;
+  const impact = resolveStaticCollisions(ship, arena);
+  ship.blocked = impact !== null;
+  if (impact !== null) {
+    // A head-on hit stops the ship quickly; a glancing one lets it slide along
+    // the shore instead of stalling against it.
+    ship.speed *= 1 - SHORE_SPEED_LOSS * impact;
   }
 }
 

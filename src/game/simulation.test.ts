@@ -193,6 +193,30 @@ describe('enemies and the world', () => {
     }
   });
 
+  it('enemies sail round an island between them and the player instead of stalling on its shore', () => {
+    // The rock sits exactly between both enemies and the player: the worst case
+    // for look-ahead steering.
+    const sim = makeSim(ISLAND_ARENA);
+    sim.player.health = 1e6;
+    const chaser = sim.addEnemy('chaser', 1290, 450, Math.PI);
+    const shooter = sim.addEnemy('shooter', 1300, 450, Math.PI);
+    const stalled = { chaser: 0, shooter: 0 };
+    const longest = { chaser: 0, shooter: 0 };
+    const events: GameEvent[] = [];
+    for (let i = 0; i < Math.round(12 / FIXED_STEP); i += 1) {
+      events.push(...sim.step(FIXED_STEP, EMPTY_INPUT));
+      for (const ship of [chaser, shooter].filter((enemy) => enemy.alive)) {
+        const key = ship.kind === 'chaser' ? 'chaser' : 'shooter';
+        stalled[key] = ship.blocked && ship.speed < 25 ? stalled[key] + FIXED_STEP : 0;
+        longest[key] = Math.max(longest[key], stalled[key]);
+      }
+    }
+    expect(events).toContainEqual(expect.objectContaining({ type: 'ram', shipId: chaser.id }));
+    expect(events).toContainEqual(expect.objectContaining({ type: 'fire', shipId: shooter.id, weapon: 'enemy' }));
+    expect(longest.chaser).toBeLessThan(1);
+    expect(longest.shooter).toBeLessThan(1);
+  });
+
   it('a destroyed enemy stops firing, dealing damage and colliding', () => {
     const sim = makeSim();
     const shooter = sim.addEnemy('shooter', 1000, 450, Math.PI);

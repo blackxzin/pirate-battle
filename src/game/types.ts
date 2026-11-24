@@ -24,6 +24,8 @@ export interface Ship {
   cooldowns: Record<WeaponId, number>;
   /** True when the last movement step was blocked by an island or the arena edge. */
   blocked: boolean;
+  /** Side an enemy is sailing round an island on: -1 = left, 1 = right, 0 = none. */
+  avoidSide: -1 | 0 | 1;
 }
 
 export interface Projectile {

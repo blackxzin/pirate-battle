@@ -51,14 +51,15 @@ Dependencies only point downward: `ui → session → render → game`, and `ui 
 
 - Ships have a heading and a scalar speed along it. Thrust accelerates, and drag slows them when no thrust is applied. Rotation uses `turnSpeed`.
 - **Shapes.** Ships are circles. Islands are axis-aligned rectangles inset 14 px from the drawn shoreline. Projectiles are small circles.
-- **Ship vs island or arena edge.** The ship is pushed out along the minimum translation (`resolveCircleRect`) and clamped to the arena. A blocked ship loses 40 % of its speed so it does not grind along the shore.
+- **Ship vs island or arena edge.** The ship is pushed out along the minimum translation (`resolveCircleRect`) and clamped to the arena. Speed loss depends on the angle of contact: sailing straight into a shore costs 40 % of the speed per step, so the ship stops, while a glancing contact costs almost nothing, so the ship slides along the shore.
 - **Ship vs ship.** Overlapping ships are separated (equal mass), and the shore is then re-resolved so a push cannot shove a ship into an island.
 - **Projectiles.**
   - A projectile hits at most one ship: it is marked dead on first contact and removed in the same step, so damage is applied once.
   - It also ends on island contact, on leaving the arena, or when it has travelled its `range`.
   - Each weapon (front, left, right, enemy) has its own cooldown.
-- **Chaser.** It steers towards the player. Look-ahead probes turn it around islands. On contact it deals `contactDamage`, explodes and never scores.
-- **Shooter.** It approaches until `preferredDistance` and keeps its bow aimed at the player. It fires its front cannon when the player is inside `attackRange`, within `aimTolerance`, and in line of sight (Liang–Barsky segment test against the islands).
+- **Chaser.** It steers towards the player and sails round islands (see "Sailing round islands" below). On contact it deals `contactDamage`, explodes and never scores.
+- **Shooter.** It approaches until `preferredDistance`, or further while an island hides the player, and keeps its bow aimed at the player. It fires its front cannon when the player is inside `attackRange`, within `aimTolerance`, and in line of sight (Liang–Barsky segment test against the islands).
+- **Sailing round islands.** Both enemies probe their course a hull's width ahead. When an island blocks it, the ship picks the side needing the smaller turn and keeps that side, following the shore, until it has a clear line to the player. Keeping the side stops it from swinging back and forth and stalling against the island face.
 - **Spawner.**
   - The first spawn comes after `initialDelay`, then one every `spawnIntervalSeconds`.
   - The first two spawns are one Chaser and one Shooter, so both types always appear. After that, `chaserWeight` decides.
@@ -165,7 +166,7 @@ The ranking only compares matches played with the same configuration. Ties are b
 - **Shooter.** 70 HP. It hits for 10 every 1.8 s and stays about 260 px away.
 - **Tuning.** With the default 3 s spawn interval, standing still sinks the player in about 20–30 s, and active play survives the full 2 minutes.
 - **Limitations.**
-  - Enemy obstacle avoidance uses probes, not path finding (fine for the sparse, convex islands).
+  - Enemy obstacle avoidance uses probes and shore following, not path finding (fine for the sparse, convex islands).
   - Collision shapes are approximate (circles and inset rectangles).
   - The arena is a single fixed layout.
   - The retina atlases are not used, because many "retina" PNGs are the same size as the default ones. Pixi renders at `devicePixelRatio` instead.

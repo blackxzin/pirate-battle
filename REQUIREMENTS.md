@@ -29,7 +29,7 @@ Each requirement of the [challenge brief](https://github.com/junglegaming/game-d
 | Keyboard and touch controls, move and fire at once, controls shown in the UI | `session/input.ts`, `TouchControls.tsx`, menu controls list | Unit `InputController`; E2E `03`, `04`, `09` (touch) |
 | Chaser chases, rams, explodes | `systems/ai.ts` | Unit; E2E `05-enemies` |
 | Shooter approaches, fires in range | `systems/ai.ts` | Unit; E2E `05-enemies` |
-| Enemies move, rotate, take damage and respect islands | `ai.ts`, `movement.ts` | Unit `enemies never sail through islands` |
+| Enemies move, rotate, take damage and respect islands | `ai.ts` (shore following), `movement.ts` | Unit `enemies never sail through islands`, `enemies sail round an island…` |
 | Both enemy types appear in a default match | spawner: first spawns are a Chaser then a Shooter | Unit; E2E `05-enemies` |
 | Spawns every interval until the end, at points clear of obstacles and far from the player | `systems/spawner.ts` | Unit `spawning`; E2E `05-enemies` |
 | Water and islands that block ships and projectiles | `game/arena.ts` | Unit `stops projectiles at islands`, `cannot cross islands` |

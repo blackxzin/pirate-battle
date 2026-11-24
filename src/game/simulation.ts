@@ -35,6 +35,7 @@ function createShip(id: number, kind: ShipKind, stats: ShipStats, x: number, y: 
     alive: true,
     cooldowns: { front: 0, left: 0, right: 0, enemy: 0 },
     blocked: false,
+    avoidSide: 0,
   };
 }
 

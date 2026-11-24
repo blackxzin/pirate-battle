@@ -6,8 +6,8 @@ Latest full run, on the machine described in [PERFORMANCE.md](PERFORMANCE.md).
 | --- | --- | --- |
 | Lint | `npm run lint` | clean |
 | Types (strict) | `npm run typecheck` | clean |
-| Unit and integration | `npm run test:coverage` | **89 passed** in 6 files |
-| End-to-end | `npm run test:e2e` | **97 passed** (3.1 min), none flaky |
+| Unit and integration | `npm run test:coverage` | **90 passed** in 6 files |
+| End-to-end | `npm run test:e2e` | **97 passed** (3.0 min), none flaky |
 
 `npm run test:all` runs all four in that order.
 
@@ -28,7 +28,7 @@ The HTML report is in [`coverage/index.html`](coverage/index.html). It covers th
 
 | Statements | Branches | Functions | Lines |
 | ---: | ---: | ---: | ---: |
-| 94.14 % | 90.61 % | 93.18 % | 94.14 % |
+| 94.04 % | 89.67 % | 93.22 % | 94.04 % |
 
 The build fails below 80 % on any of them.
 
