@@ -94,7 +94,7 @@ The Options screen also has the captain name and a sound toggle. All options are
 
 ## Mock API scenarios (network lab)
 
-Open **Options → Network lab** to pick a scenario. **Reset mock data** restores fixtures, clears pending records and goes back to `normal`. You can also add `?scenario=<id>` to the URL.
+Open **Options → Network lab** to pick a scenario. **Reset mock data** restores fixtures, clears pending records and goes back to `normal`. You can also add `?scenario=<id>` to the URL. The chosen scenario is saved in the browser, so it stays active after a refresh until you pick another one or reset. A first visit always starts on `normal`.
 
 | id | Behaviour |
 | --- | --- |
