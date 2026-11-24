@@ -66,7 +66,7 @@ Run against the production build (`vite build` + `vite preview`), with MSW runni
 
 `npm run test:e2e:live` runs the same specs against https://pirate-battle-ashy.vercel.app, with no local server. The Strict Mode project is skipped, because it needs the dev server.
 
-Latest run: **96 tests (desktop and mobile)**. 95 passed on the first try. One (`02-assets`, progress) passed on retry after a single atlas download failed over the internet, and then passed 6 of 6 when repeated. The game showed its "Assets failed to load" screen with Retry, as designed.
+Latest run: **96 passed (desktop and mobile), all on the first try**, none flaky. An earlier run had one `02-assets` progress test pass only on retry, after a single atlas download failed over the internet; the game showed its "Assets failed to load" screen with Retry, as designed.
 
 ### Determinism
 
