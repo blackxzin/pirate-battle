@@ -39,6 +39,10 @@ function buildTextures(sheets: readonly Spritesheet[]): GameTextures {
  */
 export async function loadGameTextures(onProgress: (progress: number) => void): Promise<GameTextures> {
   const urls = Object.values(ASSET_URLS);
+  // Decode the atlas PNGs as <img> elements instead of ImageBitmaps. Firefox
+  // warns when a premultiplied upload comes from a non-DOM source, and three
+  // atlases loaded once gain nothing measurable from worker decoding.
+  Assets.setPreferences({ preferCreateImageBitmap: false, preferWorkers: false });
   try {
     const loaded = await Assets.load<Spritesheet>(urls, (progress) => onProgress(progress));
     const sheets = urls.map((url) => loaded[url]);

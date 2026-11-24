@@ -7,7 +7,7 @@ Latest full run, on the machine described in [PERFORMANCE.md](PERFORMANCE.md).
 | Lint | `npm run lint` | clean |
 | Types (strict) | `npm run typecheck` | clean |
 | Unit and integration | `npm run test:coverage` | **89 passed** in 6 files |
-| End-to-end | `npm run test:e2e` | **97 passed** (2.4 min), none flaky |
+| End-to-end | `npm run test:e2e` | **97 passed** (3.1 min), none flaky |
 
 `npm run test:all` runs all four in that order.
 
@@ -74,7 +74,7 @@ Latest run: **96 tests (desktop and mobile)**. 95 passed on the first try. One (
 - Mock latency is deterministic: it depends only on the scenario and on the request number.
 - `?clock=manual` lets a test advance the simulation by an exact number of milliseconds. Inputs, rules, collisions and rendering stay real.
 - Each test gets a fresh browser context, so storage and the mock database start empty.
-- A console guard fails any test that logs an unexpected console error or throws an uncaught page error.
+- A console guard fails any test that logs an unexpected console error, logs a library deprecation notice (PixiJS prints those as plain messages), or throws an uncaught page error.
 
 ### Visual baselines
 

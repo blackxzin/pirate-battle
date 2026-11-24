@@ -67,7 +67,7 @@ Dependencies only point downward: `ui → session → render → game`, and `ui 
 
 ## Rendering and resources
 
-- **Atlases.** Three atlases are loaded once with Pixi `Assets`, with a progress callback: the UI atlas, the ships atlas (converted from Sparrow XML) and the tiles atlas (generated). Critical frames are checked before combat starts.
+- **Atlases.** Three atlases are loaded once with Pixi `Assets`, with a progress callback: the UI atlas, the ships atlas (converted from Sparrow XML) and the tiles atlas (generated). Critical frames are checked before combat starts. The PNGs are decoded as `<img>` elements rather than `ImageBitmap`s, which avoids Firefox's warning about premultiplied uploads from non-DOM sources.
 - **Load failures.** A failure shows an error with a Retry button. Pixi evicts failed URLs from its cache, so Retry re-downloads them. Textures are cached by Pixi and reused across matches. `app.destroy` is called with `texture: false` so the shared atlases survive.
 - **Static world.** Water is a `TilingSprite`. Islands are sprites built from tile frames once per match.
 - **Entities.**
@@ -155,7 +155,7 @@ The ranking only compares matches played with the same configuration. Ties are b
   - The `strict-mode-dev` project runs one spec against the Vite dev server. That is the only place React Strict Mode double-mounts effects. It checks that exactly one session (one canvas) exists and that it is released on exit.
   - Profiling (`*.perf.spec.ts`) runs only through `npm run perf`, `npm run perf:gpu` and `npm run perf:mobile`. See [reports/PERFORMANCE.md](reports/PERFORMANCE.md).
   - Every test starts from a fresh browser context, so storage and the service worker are isolated.
-  - Tests seed the RNG, use the manual clock and fail on unexpected console errors.
+  - Tests seed the RNG, use the manual clock and fail on unexpected console errors or library deprecation notices.
   - Visual baselines (menu, stable arena, result) are versioned under `e2e/__screenshots__/`.
 
 ## Balancing decisions and limitations

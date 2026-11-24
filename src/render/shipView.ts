@@ -23,9 +23,14 @@ export function shipFrame(kind: ShipKind, stage: number): string {
   return `ship_${stage * COLORS_PER_STAGE + COLOR_INDEX[kind] + 1}`;
 }
 
-/** Pixi view for one ship: hull sprite, fire on heavy damage and a health bar. */
+/**
+ * Pixi view for one ship: a container holding the hull sprite and the fire
+ * shown on heavy damage (Pixi v8 only lets containers own children), plus a
+ * health bar on its own layer so it never rotates with the hull.
+ */
 export class ShipView {
-  readonly hull: Sprite;
+  readonly view: Container;
+  private readonly hull: Sprite;
   readonly bar: HealthBar;
   private readonly fire: Sprite;
   private stage = -1;
@@ -43,18 +48,19 @@ export class ShipView {
     this.fire = new Sprite(textures.get('fire_1'));
     this.fire.anchor.set(0.5, 0.9);
     this.fire.visible = false;
-    this.hull.addChild(this.fire);
+    this.view = new Container();
+    this.view.addChild(this.hull, this.fire);
     this.bar = bars.create(BAR_SCALE[ship.kind]);
-    shipLayer.addChild(this.hull);
+    shipLayer.addChild(this.view);
     barLayer.addChild(this.bar.view);
     this.sync(0);
   }
 
   sync(dt: number): void {
     const { ship } = this;
-    this.hull.position.set(ship.x, ship.y);
+    this.view.position.set(ship.x, ship.y);
     // Sprites face up (-y); simulation angle 0 faces +x.
-    this.hull.rotation = ship.angle + Math.PI / 2;
+    this.view.rotation = ship.angle + Math.PI / 2;
     const stage = damageStage(ship.health, ship.maxHealth);
     if (stage !== this.stage) {
       this.stage = stage;
@@ -71,7 +77,7 @@ export class ShipView {
   }
 
   destroy(): void {
-    this.hull.destroy({ children: true });
+    this.view.destroy({ children: true });
     this.bar.view.destroy({ children: true });
   }
 }

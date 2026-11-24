@@ -1,8 +1,8 @@
 import { expect, openApp, snapshot, test } from './support';
 
 // MSW's service worker forwards every request, which hides asset requests from
-// page.route(), and Pixi decodes atlas images in a Web Worker. These tests need
-// no API, so the worker is blocked and the atlas descriptors (JSON) are routed.
+// page.route(). These tests need no API, so the worker is blocked and the atlas
+// descriptors (JSON) are routed.
 test.use({ serviceWorkers: 'block' });
 
 test.describe('Asset loading', () => {

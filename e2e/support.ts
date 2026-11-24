@@ -38,9 +38,17 @@ export interface OpenOptions {
 }
 
 /**
- * Every test fails on console errors. Tests that deliberately simulate network
- * failures call `consoleGuard.allowNetworkErrors()` to ignore the browser's
- * "Failed to load resource" noise (handled errors are still caught).
+ * Library deprecation notices (PixiJS logs "Deprecation Warning … Deprecated
+ * since vX" as plain messages). Browser notices about the test machine itself,
+ * such as headless Chromium's software-WebGL fallback, are not matched.
+ */
+const DEPRECATION = /Deprecation Warning|Deprecated since/i;
+
+/**
+ * Every test fails on console errors and on library deprecation notices.
+ * Tests that deliberately simulate network failures call
+ * `consoleGuard.allowNetworkErrors()` to ignore the browser's "Failed to load
+ * resource" noise (handled errors are still caught).
  */
 type Fixtures = { consoleGuard: { allowNetworkErrors: () => void; allow: (pattern: RegExp) => void } };
 
@@ -51,7 +59,7 @@ export const test = base.extend<Fixtures>({
       let networkErrorsAllowed = false;
       const allowed: RegExp[] = [];
       page.on('console', (message) => {
-        if (message.type() === 'error') errors.push(message.text());
+        if (message.type() === 'error' || DEPRECATION.test(message.text())) errors.push(message.text());
       });
       page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
       await use({
