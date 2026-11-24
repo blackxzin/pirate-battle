@@ -38,6 +38,7 @@ The run uses the `?e2e&profile` flag. It sets the player's `maxHealth` to 1 000 
 ```bash
 npm run perf:gpu   # GPU (reference result)
 npm run perf       # CPU-only WebGL (SwiftShader), the worst case
+npm run perf:mobile  # Pixel 7 emulation on the GPU, CPU slowed down 4x
 ```
 
 ## Results: one 3-minute match
@@ -64,6 +65,32 @@ npm run perf       # CPU-only WebGL (SwiftShader), the worst case
 
 The frame rate is locked to the 60 Hz display rate for the whole match.
 
+### Mobile emulation (GPU, CPU slowed down 4×): target met
+
+`npm run perf:mobile` runs the same profile in the `mobile-chromium` project:
+
+- Pixel 7 in landscape: 863 × 360 viewport, devicePixelRatio 2.625, touch, Android user agent;
+- the game caps the render resolution at 2× (`gameSession.ts`), so the canvas draws up to about 1726 × 720 pixels;
+- the CPU is slowed down 4× through the DevTools protocol (`Emulation.setCPUThrottlingRate`), a common approximation of a mid-range phone.
+
+| Time (s) | Avg FPS | p95 frame (ms) | Enemies | Projectiles | Peak entities |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 56.4 | 17.5 | 1 | 2 | 8 |
+| 19 | 59.6 | 17.4 | 6 | 1 | 22 |
+| 35 | 59.8 | 17.4 | 12 | 4 | 27 |
+| 68 | 59.9 | 17.4 | 9 | 4 | 27 |
+| 101 | 59.9 | 17.4 | 11 | 4 | 32 |
+| 135 | 59.9 | 17.4 | 11 | 5 | 32 |
+| 168 | 60.0 | 17.4 | 12 | 7 | 32 |
+
+Rows are every second sample; all 11 samples are in `perf/combat-profile-gpu-mobile-cpu4x.json`.
+
+- Only the first sample, which includes start-up, is below 59.6 FPS.
+- Worst p95: **17.5 ms**.
+- Peak: **32 entities**.
+
+The GPU is still the desktop one, so this measures the CPU and pixel-density cost, not a phone GPU.
+
 ### CPU-only WebGL (SwiftShader): worst case, below target
 
 Headless Chromium falls back to software rendering when the GPU is not enabled. CI machines and VMs without a GPU look like this.
@@ -80,6 +107,7 @@ The simulation runs on fixed 1/60 s steps, so the rules (movement, damage, coold
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | JS heap after forced GC (MB), GPU | 2.23 | 6.62 | 6.91 | 7.08 | 7.07 | 7.15 |
 | JS heap after forced GC (MB), CPU | 2.21 | 6.63 | 6.92 | 6.98 | 7.06 | 7.16 |
+| JS heap after forced GC (MB), mobile emulation | 2.25 | 6.68 | 6.96 | 7.14 | 7.23 | 7.22 |
 | Canvases left in the DOM | 0 | 0 | 0 | 0 | 0 | 0 |
 
 - **First cycle (+4.4 MB):** this is a one-off cost:

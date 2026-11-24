@@ -37,7 +37,7 @@ export function ResultScreen({ onPlayAgain }: Props) {
         <p className="result-meta" data-testid="result-meta">
           Points · {formatDuration(result.durationMs)} · {endReasonLabel(result.endReason)}
         </p>
-        <RecordStatus status={submission?.status ?? 'saved'} error={submission?.error ?? null} onRetry={() => retry(result.matchId)} />
+        <RecordStatus status={submission?.status ?? 'unknown'} error={submission?.error ?? null} onRetry={() => retry(result.matchId)} />
         <MenuButton onClick={onPlayAgain}>Play Again</MenuButton>
         <MenuButton onClick={() => navigate('menu')}>Main Menu</MenuButton>
       </Panel>
@@ -56,6 +56,13 @@ function RecordStatus({ status, error, onRetry }: RecordStatusProps) {
     return (
       <p className="notice" role="status" data-testid="record-status" data-status="saved">
         Recorded in the Captain&apos;s Log.
+      </p>
+    );
+  }
+  if (status === 'unknown') {
+    return (
+      <p className="notice" role="status" data-testid="record-status" data-status="unknown">
+        No registration was found for this battle. The mock data may have been reset.
       </p>
     );
   }

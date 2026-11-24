@@ -10,7 +10,10 @@ import { InputController } from './input';
 import { playEventSounds } from './soundEvents';
 import { Store } from './store';
 
-export type PauseReason = 'manual' | 'focus' | 'hidden';
+export type PauseReason = 'manual' | 'focus' | 'hidden' | 'portrait';
+
+/** Same query as the `.rotate-hint` overlay in styles.css: phones held upright. */
+export const PORTRAIT_QUERY = '(orientation: portrait) and (max-width: 820px)';
 export type SessionPhase = 'running' | 'paused' | 'ended';
 
 export interface HudState {
@@ -65,6 +68,7 @@ export class GameSession {
   private readonly frameStats = new FrameStats();
   private renderer: GameRenderer | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private portrait: MediaQueryList | null = null;
   private lastFrameTime = 0;
   private phase: SessionPhase = 'running';
   private destroyed = false;
@@ -156,6 +160,7 @@ export class GameSession {
     this.input.detach();
     window.removeEventListener('blur', this.handleBlur);
     document.removeEventListener('visibilitychange', this.handleVisibility);
+    this.portrait?.removeEventListener('change', this.handleOrientation);
     this.resizeObserver?.disconnect();
     this.app.ticker.remove(this.tick);
     sound.stopLoops();
@@ -176,12 +181,16 @@ export class GameSession {
     this.resizeObserver.observe(host);
     window.addEventListener('blur', this.handleBlur);
     document.addEventListener('visibilitychange', this.handleVisibility);
+    // In portrait the arena is covered by the rotate hint, so the match must not run unseen.
+    this.portrait = window.matchMedia(PORTRAIT_QUERY);
+    this.portrait.addEventListener('change', this.handleOrientation);
     this.attachInput();
     this.lastFrameTime = performance.now();
     this.app.ticker.add(this.tick);
     sound.play('game_start', 0.5);
     sound.loop('ocean_ambience_loop', 0.18);
     if (document.visibilityState === 'hidden') this.pause('hidden');
+    else if (this.portrait.matches) this.pause('portrait');
   }
 
   private attachInput(): void {
@@ -259,6 +268,10 @@ export class GameSession {
   }
 
   private readonly handleBlur = (): void => this.pause('focus');
+
+  private readonly handleOrientation = (event: MediaQueryListEvent): void => {
+    if (event.matches) this.pause('portrait');
+  };
 
   private readonly handleVisibility = (): void => {
     if (document.visibilityState === 'hidden') this.pause('hidden');

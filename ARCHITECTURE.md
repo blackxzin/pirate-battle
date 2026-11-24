@@ -40,9 +40,10 @@ Dependencies only point downward: `ui → session → render → game`, and `ui 
   4. projectiles and hits;
   5. Chaser rams;
   6. ship separation;
-  7. removal of dead entities;
+  7. removal of dead entities, together with the shots a sunk enemy still had in flight (each projectile keeps its `ownerId`), so a destroyed enemy deals no more damage;
   8. end check.
 - **Pause.** The ticker stops and keyboard input is detached, which clears held keys. The clock accumulator is reset, and `lastFrameTime` is reset on resume. So the paused time is thrown away, no cooldown or spawn timer moves, and no movement or shot carries over. Resuming needs an explicit action (the Resume button or `Esc`). The dialog stops the `Esc` event, so the game's re-attached key listener does not see it and pause again.
+  - On phones held upright (the same media query that shows the rotate hint), the match pauses too, so it never runs hidden behind the hint.
 - **End.** The status becomes `ended`, the end reason is recorded, and `step()` turns into a no-op. Movement, attacks, damage, spawns and scoring all stop. The renderer keeps playing the final explosions on a frozen world.
 - **Test clock.** With `?clock=manual` the ticker still renders, but only `advance(ms)` steps the simulation. E2E tests use this to control time exactly while sending real key and pointer events.
 
@@ -129,6 +130,9 @@ The ranking only compares matches played with the same configuration. Ties are b
 
 1. When a match completes, the record (with a client-generated `matchId`) is first written to the persisted outbox, then submitted.
 2. It leaves the outbox only after the server confirms it, or refuses it for good (4xx, or a `success: false` envelope). A refused record is shown as "could not be recorded" instead of being replayed forever.
+   - The final outcome (`saved` or `rejected`) is also stored with the last result, so the result screen still shows it after a refresh.
+   - "Reset mock data" clears that outcome, because the record no longer exists.
+   - Profiling runs (`?e2e&profile`, an unsinkable player) are never submitted, so they cannot reach the ranking.
 3. Pending records are sent again at start-up, on the `online` event, and when the player presses Retry.
 4. An in-memory in-flight set drops duplicate sends from repeated clicks. Because the server deduplicates by `matchId`, a retry after a timeout returns the stored record. The `submit-timeout-after-save` scenario covers this case.
 5. Submission is fire-and-forget from the game's point of view. API failures never block playing, the options or combat, and the player can start another match while a record is pending.
@@ -142,14 +146,14 @@ The ranking only compares matches played with the same configuration. Ties are b
 
 ## Testing
 
-- **Vitest** (86 tests, about 94 % statement coverage of the non-visual code, enforced at 80 %). Covers:
+- **Vitest** (89 tests, about 94 % statement coverage of the non-visual code, enforced at 80 %). Covers:
   - the simulation rules: movement, frame-rate independence, bounds, islands, weapons, cooldowns, single damage, scoring, Chaser and Shooter, spawns, determinism, both end conditions;
   - geometry, RNG, fixed-step clock, HUD store and keyboard input;
   - config and storage validation;
   - the API against MSW: pagination, ties, idempotency, error mapping, timeouts, out-of-order responses, envelopes and the outbox.
 - **Playwright.** The 12 required flows, plus resizing (`14-responsive`), run against `vite preview`, on desktop Chromium (1280×720) and Pixel 7 landscape (touch).
   - The `strict-mode-dev` project runs one spec against the Vite dev server. That is the only place React Strict Mode double-mounts effects. It checks that exactly one session (one canvas) exists and that it is released on exit.
-  - Profiling (`*.perf.spec.ts`) runs only through `npm run perf` / `npm run perf:gpu`. See [reports/PERFORMANCE.md](reports/PERFORMANCE.md).
+  - Profiling (`*.perf.spec.ts`) runs only through `npm run perf`, `npm run perf:gpu` and `npm run perf:mobile`. See [reports/PERFORMANCE.md](reports/PERFORMANCE.md).
   - Every test starts from a fresh browser context, so storage and the service worker are isolated.
   - Tests seed the RNG, use the manual clock and fail on unexpected console errors.
   - Visual baselines (menu, stable arena, result) are versioned under `e2e/__screenshots__/`.
@@ -166,3 +170,4 @@ The ranking only compares matches played with the same configuration. Ties are b
   - The arena is a single fixed layout.
   - The retina atlases are not used, because many "retina" PNGs are the same size as the default ones. Pixi renders at `devicePixelRatio` instead.
   - Audio needs a user gesture (browser policy). It starts on the first Play.
+  - The test hooks (`?e2e`, `?clock=manual`) are also present in the published build, so the E2E suite can run against it. They do not change the rules, except `?profile`, whose matches are not recorded.

@@ -209,6 +209,24 @@ describe('enemies and the world', () => {
     expect(sim.player.x).toBeGreaterThan(1050);
   });
 
+  it("a sunk Shooter's cannonballs still in flight are removed with it", () => {
+    const sim = makeSim();
+    const shooter = sim.addEnemy('shooter', 1100, 450, Math.PI);
+    let steps = 0;
+    while (!sim.projectiles.some((projectile) => projectile.ownerId === shooter.id) && steps < 600) {
+      sim.step(FIXED_STEP, EMPTY_INPUT);
+      steps += 1;
+    }
+    expect(sim.projectiles.some((projectile) => projectile.ownerId === shooter.id)).toBe(true);
+
+    shooter.alive = false;
+    sim.step(FIXED_STEP, EMPTY_INPUT);
+    expect(sim.projectiles.some((projectile) => projectile.ownerId === shooter.id)).toBe(false);
+    const healthBefore = sim.player.health;
+    run(sim, 2);
+    expect(sim.player.health).toBe(healthBefore);
+  });
+
   it('enemy projectiles damage the player once each', () => {
     const sim = makeSim();
     const shooter = sim.addEnemy('shooter', 1100, 450, Math.PI);

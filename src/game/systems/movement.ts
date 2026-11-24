@@ -1,6 +1,6 @@
 import type { ArenaDefinition } from '../arena';
 import type { ShipStats } from '../config';
-import { resolveCircleRect, rotateTowards } from '../math';
+import { resolveCircleRect } from '../math';
 import type { Ship } from '../types';
 
 export interface Steering {
@@ -17,11 +17,6 @@ export function applySteering(ship: Ship, stats: ShipStats, steering: Steering, 
   } else {
     ship.speed = Math.max(0, ship.speed - stats.drag * dt);
   }
-}
-
-/** Steering helper that turns towards a target heading. */
-export function turnTowards(ship: Ship, stats: ShipStats, targetAngle: number, dt: number): void {
-  ship.angle = rotateTowards(ship.angle, targetAngle, stats.turnSpeed * dt);
 }
 
 /** Pushes the ship out of islands and keeps it inside the arena. */

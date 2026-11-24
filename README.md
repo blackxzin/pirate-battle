@@ -38,6 +38,7 @@ None are required. The game runs fully in the browser and the backend is MSW. Th
 | `npm run test:e2e:update` | Re-records the visual-regression baselines |
 | `npm run perf` | Combat and memory profiling with CPU (SwiftShader) WebGL, the worst case (writes `reports/perf/*-software.json`) |
 | `npm run perf:gpu` | Same profiling on the machine's GPU (writes `reports/perf/*-gpu.json`) |
+| `npm run perf:mobile` | Same profiling in Pixel 7 emulation on the GPU, with the CPU slowed down 4× (writes `reports/perf/*-gpu-mobile-cpu4x.json`) |
 | `npm run assets -- <path>` | Rebuilds `public/assets` from the challenge asset pack |
 | `npm run test:all` | Runs lint, typecheck, unit tests with coverage, and E2E |
 
@@ -130,7 +131,14 @@ Inputs still go through real keyboard and pointer events. The real rules, collis
 
 ### Game assets
 
-All art and sounds come from the asset pack of the [Jungle Gaming game developer challenge](https://github.com/junglegaming/game-developer-challenge) (`assets/`). They are used here only for this challenge, under the terms of that repository. No other art was added.
+All art and sounds come from the asset pack of the [Jungle Gaming game developer challenge](https://github.com/junglegaming/game-developer-challenge) (`assets/`). No other art, sound or font was added.
+
+| Assets | Source | Licence |
+| --- | --- | --- |
+| Ships, ship parts, cannonballs, effects, tiles (`ships_miscellaneous_sheet`, `tiles_sheet`) | The format and art match [Kenney's Pirate Pack](https://kenney.nl/assets/pirate-pack) (2017). | Kenney's packs are [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) (public domain). |
+| UI atlas (`ui_sheet`), scene background, Jungle Gaming logo, sounds | Supplied with the challenge | No licence file is included; they are used only for this challenge, under the terms of the challenge repository. |
+
+The challenge pack ships no licence file of its own, so the attribution above is the best available information.
 
 [`scripts/prepare-assets.mjs`](scripts/prepare-assets.mjs) builds `public/assets` from that pack (`npm run assets -- <path-to-challenge>/assets`; `ffmpeg` is required for the audio step). It:
 

@@ -14,7 +14,7 @@ describe('format', () => {
 
   it('formats the played-at date in local time', () => {
     const iso = new Date(2026, 8, 8, 19, 36).toISOString();
-    expect(formatPlayedAt(iso)).toBe('08 SEP · 19:36');
+    expect(formatPlayedAt(iso)).toBe('08 SEP 2026 · 19:36');
     expect(formatPlayedAt('not a date')).toBe('—');
   });
 

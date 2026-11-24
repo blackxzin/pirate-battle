@@ -36,4 +36,27 @@ test.describe('Responsive arena', () => {
     await page.keyboard.up('KeyW');
     expect((await snapshot(page)).player.y).toBeLessThan(before.player.y);
   });
+
+  test('turning a phone upright pauses the match until the player resumes in landscape', async ({ page }) => {
+    await openApp(page, { options: { sessionSeconds: 120, spawnIntervalSeconds: 10 } });
+    await startBattle(page);
+    await advance(page, 500);
+    const landscape = page.viewportSize();
+    if (!landscape) throw new Error('viewport size unknown');
+
+    await page.setViewportSize({ width: 360, height: 740 });
+    await expect(page.getByRole('note')).toContainText(/rotate|landscape|sideways/i);
+    await expect(page.getByRole('dialog', { name: 'Paused' })).toContainText('turned upright');
+    const paused = await snapshot(page);
+    expect(paused.phase).toBe('paused');
+    await page.waitForTimeout(500);
+    expect((await snapshot(page)).timeLeft).toBe(paused.timeLeft);
+
+    await page.setViewportSize(landscape);
+    await expect(page.getByRole('note')).toBeHidden();
+    await page.getByRole('button', { name: 'Resume' }).click();
+    await expect(page.getByTestId('status-phase')).toHaveText('running');
+    await advance(page, 1000);
+    expect((await snapshot(page)).timeLeft).toBeCloseTo(paused.timeLeft - 1, 5);
+  });
 });

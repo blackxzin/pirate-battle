@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useMatchSync } from '../../../api/MatchSyncProvider';
 import type { MatchRecord } from '../../../api/contracts';
+import { runtimeFlags } from '../../../runtimeFlags';
 import type { HudState, MatchOutcome } from '../../../session/gameSession';
 import type { Store } from '../../../session/store';
 import { createId, loadPlayer, saveLastResult } from '../../../storage/preferences';
@@ -57,8 +58,10 @@ export function GameScreen() {
         endReason: record.endReason,
         playedAt: record.playedAt,
         config: options,
+        // Profiling runs change the rules (an unsinkable player), so they never reach the ranking.
+        ...(runtimeFlags.profiling ? { record: { status: 'rejected', error: 'profiling runs are not recorded' } as const } : {}),
       });
-      submit(record);
+      if (!runtimeFlags.profiling) submit(record);
       resultTimer.current = window.setTimeout(() => navigate('result', { replace: true }), RESULT_DELAY_MS);
     },
     [submit],

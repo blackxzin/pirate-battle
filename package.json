@@ -17,7 +17,8 @@
     "perf": "PERF=1 playwright test e2e/profiling.perf.spec.ts --project=desktop-chromium",
     "test:all": "npm run lint && npm run typecheck && npm run test:coverage && npm run test:e2e",
     "test:coverage": "vitest run --coverage",
-    "perf:gpu": "PERF_GPU=1 PERF=1 playwright test e2e/profiling.perf.spec.ts --project=desktop-chromium"
+    "perf:gpu": "PERF_GPU=1 PERF=1 playwright test e2e/profiling.perf.spec.ts --project=desktop-chromium",
+    "perf:mobile": "PERF_GPU=1 PERF=1 PERF_CPU_THROTTLE=4 playwright test e2e/profiling.perf.spec.ts --project=mobile-chromium"
   },
   "msw": {
     "workerDirectory": [

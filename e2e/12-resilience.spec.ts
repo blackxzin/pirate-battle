@@ -27,11 +27,21 @@ test.describe('Registration resilience', () => {
     await expect(page.getByTestId('record-status')).toHaveAttribute('data-status', 'pending', { timeout: 15_000 });
 
     await page.evaluate(() => localStorage.setItem('pirate-battle:mock-scenario:v1', 'normal'));
-    const retry = page.getByRole('button', { name: 'Retry now' });
-    await retry.click();
-    await retry.click({ force: true, timeout: 1000 }).catch(() => undefined);
-    await retry.click({ force: true, timeout: 1000 }).catch(() => undefined);
+    await expect(page.getByRole('button', { name: 'Retry now' })).toBeVisible();
+    const posts: string[] = [];
+    page.on('request', (request) => {
+      if (request.method() === 'POST' && request.url().endsWith('/api/matches')) posts.push(request.url());
+    });
+    // Three real clicks in one task, before React can hide the button.
+    await page.evaluate(() => {
+      const button = [...document.querySelectorAll('button')].find((item) => item.textContent === 'Retry now');
+      if (!button) throw new Error('Retry button missing');
+      button.click();
+      button.click();
+      button.click();
+    });
     await expect(page.getByTestId('record-status')).toHaveAttribute('data-status', 'saved', { timeout: 15_000 });
+    expect(posts).toHaveLength(1);
 
     await page.getByRole('button', { name: 'Main Menu' }).click();
     await page.getByRole('button', { name: 'Match History' }).click();

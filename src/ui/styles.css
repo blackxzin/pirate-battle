@@ -673,6 +673,7 @@ details.network-lab summary {
   display: none;
 }
 
+/* Keep in sync with PORTRAIT_QUERY in src/session/gameSession.ts (it pauses the match). */
 @media (orientation: portrait) and (max-width: 820px) {
   .rotate-hint {
     position: absolute;

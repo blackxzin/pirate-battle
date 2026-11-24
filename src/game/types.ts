@@ -28,6 +28,8 @@ export interface Ship {
 
 export interface Projectile {
   readonly id: number;
+  /** Ship that fired it: a sunk enemy's shots are removed with it. */
+  readonly ownerId: number;
   readonly faction: Faction;
   readonly weapon: WeaponId;
   x: number;

@@ -11,7 +11,9 @@ import { expect, openApp, startBattle, test } from './support';
  */
 const REPORT_DIR = join(process.cwd(), 'reports', 'perf');
 /** `gpu` when run with PERF_GPU=1, otherwise `software` (SwiftShader). */
-const RENDERER_LABEL = process.env.PERF_GPU ? 'gpu' : 'software';
+const RENDERER = process.env.PERF_GPU ? 'gpu' : 'software';
+/** CPU slowdown applied through CDP (PERF_CPU_THROTTLE=4 approximates a mid-range phone). */
+const CPU_THROTTLE = Math.max(1, Number(process.env.PERF_CPU_THROTTLE ?? 1));
 const TARGET_SECONDS = 180;
 const SAMPLE_EVERY_MS = 15_000;
 
@@ -22,6 +24,20 @@ interface Sample {
   readonly maxEntities: number;
   readonly enemies: number;
   readonly projectiles: number;
+}
+
+/** Report file suffix, e.g. `gpu`, `gpu-mobile` or `gpu-mobile-cpu4x`. */
+function reportLabel(projectName: string): string {
+  const parts = [RENDERER];
+  if (projectName.startsWith('mobile')) parts.push('mobile');
+  if (CPU_THROTTLE > 1) parts.push(`cpu${CPU_THROTTLE}x`);
+  return parts.join('-');
+}
+
+async function throttleCpu(page: Page): Promise<CDPSession> {
+  const cdp = await page.context().newCDPSession(page);
+  if (CPU_THROTTLE > 1) await cdp.send('Emulation.setCPUThrottlingRate', { rate: CPU_THROTTLE });
+  return cdp;
 }
 
 async function heapUsedMb(cdp: CDPSession): Promise<number> {
@@ -50,8 +66,9 @@ async function readSample(page: Page, atSeconds: number): Promise<Sample | null>
 
 test.describe.configure({ mode: 'serial' });
 
-test('3-minute combat profile', async ({ page }) => {
+test('3-minute combat profile', async ({ page }, testInfo) => {
   test.setTimeout(TARGET_SECONDS * 1000 + 120_000);
+  await throttleCpu(page);
   // One full 3-minute match. With `profile` the player cannot sink (a config
   // override), so enemies keep spawning up to the cap: a worst-case load.
   await openApp(page, { manualClock: false, profile: true, seed: 11, options: { sessionSeconds: TARGET_SECONDS, spawnIntervalSeconds: 2 } });
@@ -91,14 +108,15 @@ test('3-minute combat profile', async ({ page }) => {
     devicePixelRatio: window.devicePixelRatio,
     hardwareConcurrency: navigator.hardwareConcurrency,
   }));
+  const label = reportLabel(testInfo.project.name);
   const worstP95 = Math.max(...samples.map((sample) => sample.p95FrameMs));
   const minFps = Math.min(...samples.map((sample) => sample.averageFps));
   const maxEntities = Math.max(...samples.map((sample) => sample.maxEntities));
   mkdirSync(REPORT_DIR, { recursive: true });
   writeFileSync(
-    join(REPORT_DIR, `combat-profile-${RENDERER_LABEL}.json`),
+    join(REPORT_DIR, `combat-profile-${label}.json`),
     JSON.stringify(
-      { environment, config: { sessionSeconds: TARGET_SECONDS, spawnIntervalSeconds: 2, seed: 11, playerCannotSink: true }, samples, summary: { minFps, worstP95, maxEntities } },
+      { environment: { ...environment, project: testInfo.project.name, cpuThrottle: CPU_THROTTLE }, config: { sessionSeconds: TARGET_SECONDS, spawnIntervalSeconds: 2, seed: 11, playerCannotSink: true }, samples, summary: { minFps, worstP95, maxEntities } },
       null,
       2,
     ),
@@ -106,9 +124,9 @@ test('3-minute combat profile', async ({ page }) => {
   expect(samples.length).toBeGreaterThan(5);
 });
 
-test('memory after 5 start/play/exit cycles', async ({ page }) => {
-  test.setTimeout(240_000);
-  const cdp = await page.context().newCDPSession(page);
+test('memory after 5 start/play/exit cycles', async ({ page }, testInfo) => {
+  test.setTimeout(240_000 * CPU_THROTTLE);
+  const cdp = await throttleCpu(page);
   await cdp.send('Performance.enable');
   await openApp(page, { manualClock: false, seed: 5, options: { sessionSeconds: 60, spawnIntervalSeconds: 1 } });
   const baseline = await heapUsedMb(cdp);
@@ -128,7 +146,7 @@ test('memory after 5 start/play/exit cycles', async ({ page }) => {
   }
 
   mkdirSync(REPORT_DIR, { recursive: true });
-  writeFileSync(join(REPORT_DIR, `memory-cycles-${RENDERER_LABEL}.json`), JSON.stringify({ baselineMb: baseline, cycles }, null, 2));
+  writeFileSync(join(REPORT_DIR, `memory-cycles-${reportLabel(testInfo.project.name)}.json`), JSON.stringify({ baselineMb: baseline, cycles }, null, 2));
   expect(cycles.every((entry) => entry.canvases === 0)).toBe(true);
   const growth = (cycles.at(-1)?.heapMb ?? 0) - (cycles[0]?.heapMb ?? 0);
   expect(growth).toBeLessThan(15);

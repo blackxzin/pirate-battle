@@ -24,6 +24,13 @@ export interface LastResult {
   readonly endReason: EndReason;
   readonly playedAt: string;
   readonly config: MatchOptions;
+  /** Final registration outcome, kept so the result screen survives a refresh. */
+  readonly record?: RecordOutcome;
+}
+
+export interface RecordOutcome {
+  readonly status: 'saved' | 'rejected';
+  readonly error?: string;
 }
 
 export const DEFAULT_OPTIONS: PlayerOptions = {
@@ -65,7 +72,16 @@ function isLastResult(value: unknown): value is LastResult {
     typeof value.playedAt === 'string' &&
     isRecord(value.config) &&
     isValidSessionSeconds(value.config.sessionSeconds) &&
-    isValidSpawnSeconds(value.config.spawnIntervalSeconds)
+    isValidSpawnSeconds(value.config.spawnIntervalSeconds) &&
+    (value.record === undefined || isRecordOutcome(value.record))
+  );
+}
+
+function isRecordOutcome(value: unknown): value is RecordOutcome {
+  return (
+    isRecord(value) &&
+    (value.status === 'saved' || value.status === 'rejected') &&
+    (value.error === undefined || typeof value.error === 'string')
   );
 }
 
@@ -104,4 +120,12 @@ export function loadLastResult(): LastResult | null {
 
 export function saveLastResult(result: LastResult): void {
   writeJson(STORAGE_KEYS.lastResult, result);
+}
+
+/** Stores (or, with `null`, forgets) the registration outcome of the last result if it is that match. */
+export function saveRecordOutcome(matchId: string, outcome: RecordOutcome | null): void {
+  const last = loadLastResult();
+  if (!last || last.matchId !== matchId) return;
+  const updated: LastResult = { ...last, record: outcome ?? undefined };
+  saveLastResult(updated);
 }

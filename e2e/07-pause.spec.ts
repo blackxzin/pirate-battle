@@ -18,14 +18,16 @@ test.describe('Pause', () => {
     expect(during.player.cooldowns).toEqual(before.player.cooldowns);
     expect(during.player.y).toBe(before.player.y);
 
-    await page.keyboard.up('KeyW');
-    await page.keyboard.up('Space');
+    // W and Space are still held down: resuming must not carry them over.
     await page.getByRole('button', { name: 'Resume' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await advance(page, 1500);
     const after = await snapshot(page);
     expect(after.player.speed).toBe(0);
+    expect(after.player.cooldowns.front).toBe(0);
     expect(after.timeLeft).toBeCloseTo(before.timeLeft - 1.5, 5);
+    await page.keyboard.up('KeyW');
+    await page.keyboard.up('Space');
   });
 
   test('Escape pauses and Escape resumes', async ({ page }) => {

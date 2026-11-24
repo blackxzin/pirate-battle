@@ -5,6 +5,7 @@ import { resetMockDb } from '../../mocks/db';
 import { resetMockNetworkState } from '../../mocks/handlers';
 import { DEFAULT_SCENARIO, SCENARIOS, getScenario, isScenarioId, setScenario, type ScenarioId } from '../../mocks/scenarios';
 import { STORAGE_KEYS, removeKey } from '../../storage/localStore';
+import { loadLastResult, saveRecordOutcome } from '../../storage/preferences';
 
 /**
  * Developer panel to pick a mocked network scenario and restore the initial
@@ -30,6 +31,8 @@ export function NetworkLab() {
     resetMockDb();
     resetMockNetworkState();
     removeKey(STORAGE_KEYS.pendingMatches);
+    const last = loadLastResult();
+    if (last) saveRecordOutcome(last.matchId, null);
     pendingMatches.reload();
     setScenario(DEFAULT_SCENARIO);
     setScenarioState(DEFAULT_SCENARIO);

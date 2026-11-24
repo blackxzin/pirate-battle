@@ -6,10 +6,6 @@ import { expect, openApp, snapshot, test } from './support';
 test.use({ serviceWorkers: 'block' });
 
 test.describe('Asset loading', () => {
-  test.beforeEach(({ consoleGuard }) => {
-    consoleGuard.allow(/Mock API could not start/);
-  });
-
   test('shows progress while the atlases download', async ({ page }) => {
     let release: () => void = () => undefined;
     const held = new Promise<void>((resolve) => {

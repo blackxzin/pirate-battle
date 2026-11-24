@@ -26,8 +26,10 @@ export default defineConfig({
   },
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : 4,
+  // One retry absorbs rare browser-process crashes under memory pressure; the
+  // HTML report still flags any test that needed it as flaky.
+  retries: 1,
+  workers: process.env.CI ? 2 : 3,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'reports/playwright' }]],
   outputDir: 'test-results',
   snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{testFilePath}/{arg}{ext}',

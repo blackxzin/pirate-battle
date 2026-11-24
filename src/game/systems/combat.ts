@@ -9,6 +9,7 @@ export interface ProjectileFactory {
 
 function createProjectile(
   ids: ProjectileFactory,
+  ownerId: number,
   faction: Faction,
   weapon: WeaponId,
   x: number,
@@ -19,6 +20,7 @@ function createProjectile(
 ): Projectile {
   return {
     id: ids.nextId(),
+    ownerId,
     faction,
     weapon,
     x,
@@ -54,6 +56,7 @@ export function fireFront(
   const muzzle = ship.radius + radius + 2;
   return createProjectile(
     ids,
+    ship.id,
     faction,
     weapon,
     ship.x + Math.cos(ship.angle) * muzzle,
@@ -88,6 +91,7 @@ export function fireBroadside(
     const along = (index - half) * stats.spacing;
     return createProjectile(
       ids,
+      ship.id,
       'player',
       side,
       originX + forwardX * along,

@@ -37,12 +37,12 @@ Each requirement of the [challenge brief](https://github.com/junglegaming/game-d
 | Player shots hit enemies; enemy shots hit the player | factions in `updateProjectiles` | Unit `enemy projectiles damage the player once each` |
 | One hit per projectile; removed on hit, island, range or leaving the arena | `updateProjectiles` | Unit `damages each target only once`, `removes projectiles…` |
 | Each weapon has its own cooldown | `tickCooldowns` | Unit; E2E `04-combat` |
-| A destroyed enemy stops dealing damage, firing and colliding | `removeDead` | Unit `a destroyed enemy stops…` |
+| A destroyed enemy stops dealing damage, firing and colliding | `removeDead` (also removes its shots in flight) | Unit `a destroyed enemy stops…`, `a sunk Shooter's cannonballs…` |
 | Duration 60–180 s, 1 point per kill, Chaser self-destruct scores 0 | `config.ts`, `simulation.ts` | Unit; E2E `04`, `05` |
 | Ends on time or death and freezes everything | `checkEnd`, `step` no-op | Unit; E2E `06-match-end` |
 | Restart creates a clean match | new `GameSession` per match (`key`) | E2E `06` *Play Again starts a clean match* |
 | Health above the player and each enemy; HUD shows score and time | `render/healthBar.ts`, `Hud.tsx` | E2E visual `arena` |
-| Manual pause, auto-pause on blur or hidden tab; time, cooldowns and simulation frozen; explicit resume; nothing accumulates | `GameSession.pause/resume` | E2E `07-pause` (4 tests) |
+| Manual pause, auto-pause on blur, hidden tab, or a phone turned upright; time, cooldowns and simulation frozen; explicit resume; nothing accumulates | `GameSession.pause/resume` | E2E `07-pause` (4 tests), `14-responsive` |
 | Firing, explosion and damage-stage effects | `render/effects.ts`, `shipView.ts` | Visual baselines; manual |
 
 ## 3. Screens and settings
@@ -141,7 +141,7 @@ Each requirement of the [challenge brief](https://github.com/junglegaming/game-d
 
 | Requirement | Evidence |
 | --- | --- |
-| 60 FPS target in a documented environment; FPS, p95 and entity count over one 3-minute match | [reports/PERFORMANCE.md](reports/PERFORMANCE.md) |
+| 60 FPS target in a documented environment; FPS, p95 and entity count over one 3-minute match | [reports/PERFORMANCE.md](reports/PERFORMANCE.md): desktop GPU, CPU-only WebGL, and mobile emulation (Pixel 7, CPU slowed down 4×) |
 | Memory after 5 start/play/exit cycles | same report |
 
 ## 11. Delivery

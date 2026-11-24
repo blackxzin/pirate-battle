@@ -23,6 +23,11 @@ test.describe("Captain's Log", () => {
     await page.keyboard.press('ArrowRight');
     await expect(page.getByRole('tab', { name: 'Match History' })).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByText('No battles recorded yet. Set sail!')).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Match History' })).toBeFocused();
+    // Activating a tab with a click (or Enter on it) also keeps focus on that tab.
+    await page.getByRole('tab', { name: 'Ranking' }).click();
+    await expect(page.getByRole('tab', { name: 'Ranking' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tab', { name: 'Ranking' })).toBeFocused();
   });
 
   test('match history is paginated, newest first, with every field', async ({ page }) => {

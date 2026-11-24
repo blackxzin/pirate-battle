@@ -229,9 +229,11 @@ export class Simulation {
   }
 
   private removeDead(): void {
+    const sunk = new Set(this.enemies.filter((enemy) => !enemy.alive).map((enemy) => enemy.id));
     const aliveEnemies = this.enemies.filter((enemy) => enemy.alive);
     this.enemies.splice(0, this.enemies.length, ...aliveEnemies);
-    const aliveProjectiles = this.projectiles.filter((projectile) => projectile.alive);
+    // A destroyed enemy stops dealing damage: its shots still in flight go with it.
+    const aliveProjectiles = this.projectiles.filter((projectile) => projectile.alive && !sunk.has(projectile.ownerId));
     this.projectiles.splice(0, this.projectiles.length, ...aliveProjectiles);
   }
 

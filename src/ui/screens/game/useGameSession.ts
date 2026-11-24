@@ -118,7 +118,7 @@ export function useGameSession(
       .catch((error: unknown) => {
         window.clearTimeout(startTimer);
         if (disposed) return;
-        console.error('Could not start the battle', error);
+        console.warn('Could not start the battle', error);
         setStartError(error instanceof SessionStartError ? error.message : 'The battle could not be started.');
       });
 

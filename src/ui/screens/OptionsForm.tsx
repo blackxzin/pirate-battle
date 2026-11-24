@@ -16,8 +16,9 @@ type Limits = { readonly min: number; readonly max: number; readonly step: numbe
 
 export function validateNumber(raw: string, limits: Limits, label: string): string | null {
   if (raw.trim() === '') return `${label} is required.`;
+  // Plain decimals only: Number() alone would also accept "0x3C" or "1e2".
+  if (!/^\s*\d+(\.\d+)?\s*$/.test(raw)) return `${label} must be a number.`;
   const value = Number(raw);
-  if (!Number.isFinite(value)) return `${label} must be a number.`;
   if (value < limits.min || value > limits.max) return `${label} must be between ${limits.min} and ${limits.max} seconds.`;
   const steps = (value - limits.min) / limits.step;
   if (Math.abs(steps - Math.round(steps)) > 1e-6) return `${label} must use steps of ${limits.step} seconds.`;

@@ -15,6 +15,7 @@ const REASON_TEXT: Record<PauseReason, string> = {
   manual: 'Ready when you are.',
   focus: 'The game paused because the window lost focus.',
   hidden: 'The game paused while the tab was hidden.',
+  portrait: 'The game paused because the device was turned upright. Turn it sideways to keep playing.',
 };
 
 export function PauseDialog({ reason, onResume, onMainMenu }: Props) {

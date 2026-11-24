@@ -10,6 +10,7 @@ import {
   saveLastResult,
   saveOptions,
   savePlayerName,
+  saveRecordOutcome,
   type LastResult,
 } from './preferences';
 
@@ -77,6 +78,26 @@ describe('last result', () => {
     writeJson(STORAGE_KEYS.lastResult, { ...RESULT, endReason: 'quit' });
     expect(loadLastResult()).toBeNull();
     writeJson(STORAGE_KEYS.lastResult, { ...RESULT, config: { sessionSeconds: 5, spawnIntervalSeconds: 3 } });
+    expect(loadLastResult()).toBeNull();
+  });
+});
+
+describe('record outcome', () => {
+  it('is stored on the matching last result only and can be cleared', () => {
+    saveLastResult(RESULT);
+    saveRecordOutcome('other-match', { status: 'saved' });
+    expect(loadLastResult()?.record).toBeUndefined();
+
+    saveRecordOutcome(RESULT.matchId, { status: 'rejected', error: 'Bad request' });
+    expect(loadLastResult()).toEqual({ ...RESULT, record: { status: 'rejected', error: 'Bad request' } });
+
+    saveRecordOutcome(RESULT.matchId, null);
+    expect(loadLastResult()).toEqual(RESULT);
+  });
+
+  it('rejects a tampered outcome', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    writeJson(STORAGE_KEYS.lastResult, { ...RESULT, record: { status: 'maybe' } });
     expect(loadLastResult()).toBeNull();
   });
 });

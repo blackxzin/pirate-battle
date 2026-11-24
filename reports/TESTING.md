@@ -6,8 +6,8 @@ Latest full run, on the machine described in [PERFORMANCE.md](PERFORMANCE.md).
 | --- | --- | --- |
 | Lint | `npm run lint` | clean |
 | Types (strict) | `npm run typecheck` | clean |
-| Unit and integration | `npm run test:coverage` | **86 passed** in 6 files |
-| End-to-end | `npm run test:e2e` | **95 passed** (2.1 min) |
+| Unit and integration | `npm run test:coverage` | **89 passed** in 6 files |
+| End-to-end | `npm run test:e2e` | **97 passed** (2.4 min), none flaky |
 
 `npm run test:all` runs all four in that order.
 
@@ -28,7 +28,7 @@ The HTML report is in [`coverage/index.html`](coverage/index.html). It covers th
 
 | Statements | Branches | Functions | Lines |
 | ---: | ---: | ---: | ---: |
-| 93.96 % | 90.19 % | 92.57 % | 93.96 % |
+| 94.14 % | 90.61 % | 93.18 % | 94.14 % |
 
 The build fails below 80 % on any of them.
 
@@ -38,8 +38,8 @@ Run against the production build (`vite build` + `vite preview`), with MSW runni
 
 | Project | Device | Tests |
 | --- | --- | ---: |
-| `desktop-chromium` | 1280 × 720 | 47 |
-| `mobile-chromium` | Pixel 7, landscape, touch | 47 |
+| `desktop-chromium` | 1280 × 720 | 48 |
+| `mobile-chromium` | Pixel 7, landscape, touch | 48 |
 | `strict-mode-dev` | dev server, where React Strict Mode double-mounts | 1 |
 
 | Spec | Tests | Flow from the brief |
@@ -57,14 +57,15 @@ Run against the production build (`vite build` + `vite preview`), with MSW runni
 | `11-records` | 2 | registration updates both tabs; pending record recovered after refresh |
 | `12-resilience` | 3 | resend after timeout without duplicates; API failures never block play |
 | `13-visual` | 3 | visual regression: menu, arena, result |
-| `14-responsive` | 1 | resizing during a match keeps rules, HUD and input |
+| `14-responsive` | 2 | resizing during a match keeps rules, HUD and input; turning a phone upright pauses the match |
 | `strict-mode.dev` | 1 | one session per match under Strict Mode, released on exit |
 
-`profiling.perf.spec.ts` is excluded from the normal run. `npm run perf` and `npm run perf:gpu` run it; see [PERFORMANCE.md](PERFORMANCE.md).
+`profiling.perf.spec.ts` is excluded from the normal run. `npm run perf`, `npm run perf:gpu` and `npm run perf:mobile` run it; see [PERFORMANCE.md](PERFORMANCE.md).
 
 ### Determinism
 
-- `?seed=` fixes the match RNG and the mock latency.
+- `?seed=` fixes the match RNG.
+- Mock latency is deterministic: it depends only on the scenario and on the request number.
 - `?clock=manual` lets a test advance the simulation by an exact number of milliseconds. Inputs, rules, collisions and rendering stay real.
 - Each test gets a fresh browser context, so storage and the mock database start empty.
 - A console guard fails any test that logs an unexpected console error or throws an uncaught page error.
@@ -84,4 +85,13 @@ npx playwright test e2e/13-visual.spec.ts --update-snapshots
 
 ### Stability notes
 
-Under heavy local load (four workers, two web servers and other processes), two earlier full runs each had one timeout: `browserContext.newPage` in `14-responsive`, and one `07-pause` test. Both passed when repeated in isolation: 10 of 10 and 30 of 30 runs. The latest full run passed 95 of 95. With `CI` set, Playwright uses two workers and one retry, and the HTML report marks any test that passes only on retry as flaky.
+The rules, inputs and clock are deterministic, so a test that fails for the game's own reasons fails every time.
+
+On the reference machine, with other desktop apps open and about 2.7 GB of swap in use, a few full runs had one failure each:
+
+- `browserContext.newPage` timed out;
+- a page crashed (`Target crashed`) while a battle started.
+
+Each test involved passed when repeated alone: 10 of 10, 30 of 30, and in later full runs. Four parallel Chromium instances running software WebGL (SwiftShader) need a lot of memory, so the browser crashes, not the game.
+
+The config therefore uses three local workers (two on CI) and one retry. The HTML report marks any test that passes only on retry as **flaky**, so a retry never hides a failure.

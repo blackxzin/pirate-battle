@@ -30,12 +30,16 @@ export function CaptainsLog({ tab }: Props) {
   const pending = usePendingMatches();
   const { retryAll } = useMatchSync();
 
+  // The route remounts this screen, so focus is put back on the chosen tab.
+  const selectTab = (next: Tab) => {
+    navigate(next, { replace: true });
+    requestAnimationFrame(() => document.getElementById(`tab-${next}`)?.focus());
+  };
+
   const handleTabKeys = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
     event.preventDefault();
-    const next = tab === 'ranking' ? 'history' : 'ranking';
-    navigate(next, { replace: true });
-    requestAnimationFrame(() => document.getElementById(`tab-${next}`)?.focus());
+    selectTab(tab === 'ranking' ? 'history' : 'ranking');
   };
 
   return (
@@ -52,7 +56,7 @@ export function CaptainsLog({ tab }: Props) {
               aria-selected={item.id === tab}
               aria-controls={`panel-${item.id}`}
               tabIndex={item.id === tab ? 0 : -1}
-              onClick={() => navigate(item.id, { replace: true })}
+              onClick={() => selectTab(item.id)}
             >
               {item.label}
             </MenuButton>

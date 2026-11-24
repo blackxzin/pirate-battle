@@ -18,7 +18,7 @@ export async function startMockApi(): Promise<boolean> {
     });
     return true;
   } catch (error: unknown) {
-    console.error('Mock API could not start; ranking and history will be unavailable.', error);
+    console.warn('Mock API could not start; ranking and history will be unavailable.', error);
     return false;
   }
 }

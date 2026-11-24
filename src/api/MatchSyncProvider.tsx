@@ -1,14 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Store } from '../session/store';
+import { loadLastResult, saveRecordOutcome } from '../storage/preferences';
 import type { MatchRecord } from './contracts';
 import { toApiError } from './http';
 import { matchesApi } from './matchesApi';
 import { pendingMatches } from './pendingMatches';
 import { queryKeys } from './queries';
 
-/** `rejected`: the server refused the record for good (4xx); it is not retried. */
-export type SubmissionStatus = 'saving' | 'pending' | 'saved' | 'rejected';
+/**
+ * `rejected`: the server refused the record for good (4xx); it is not retried.
+ * `unknown`: no outcome is known, e.g. after the mock data was reset.
+ */
+export type SubmissionStatus = 'saving' | 'pending' | 'saved' | 'rejected' | 'unknown';
 
 export interface SubmissionState {
   readonly status: SubmissionStatus;
@@ -48,6 +52,7 @@ export function MatchSyncProvider({ children }: { readonly children: ReactNode }
       mutateAsync(record)
         .then(() => {
           pendingMatches.remove(record.matchId);
+          saveRecordOutcome(record.matchId, { status: 'saved' });
           statuses.update({ [record.matchId]: { status: 'saved', error: null } });
           void queryClient.invalidateQueries({ queryKey: queryKeys.rankingAll });
           void queryClient.invalidateQueries({ queryKey: queryKeys.historyAll });
@@ -61,6 +66,7 @@ export function MatchSyncProvider({ children }: { readonly children: ReactNode }
           // Permanent refusal: replaying it on every start-up would never succeed.
           console.warn('Match record rejected by the server', record.matchId, apiError.message);
           pendingMatches.remove(record.matchId);
+          saveRecordOutcome(record.matchId, { status: 'rejected', error: apiError.message });
           statuses.update({ [record.matchId]: { status: 'rejected', error: apiError.message } });
         })
         .finally(() => {
@@ -116,5 +122,7 @@ export function useSubmission(matchId: string | null): SubmissionState | null {
   if (!matchId) return null;
   const live = all[matchId];
   if (live) return live;
-  return pending.some((item) => item.matchId === matchId) ? { status: 'pending', error: null } : { status: 'saved', error: null };
+  if (pending.some((item) => item.matchId === matchId)) return { status: 'pending', error: null };
+  const outcome = loadLastResult()?.matchId === matchId ? loadLastResult()?.record : undefined;
+  return outcome ? { status: outcome.status, error: outcome.error ?? null } : { status: 'unknown', error: null };
 }
