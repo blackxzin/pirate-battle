@@ -149,7 +149,7 @@ Each requirement of the [challenge brief](https://github.com/junglegaming/game-d
 | Requirement | Where |
 | --- | --- |
 | Source code, lockfile, assets, mocks, fixtures and tests | repository |
-| Public deploy on Vercel, running the mocks | README *Live demo* |
+| Public deploy on Vercel, running the mocks | https://pirate-battle-ashy.vercel.app; `npm run test:e2e:live` runs the E2E suite against it |
 | README: setup, environment variables, controls, gameplay config, scenarios, commands, reproducing failures | README.md |
 | ARCHITECTURE.md with decisions, limitations and balancing | ARCHITECTURE.md |
 | Test and profiling reports | [reports/](reports) |

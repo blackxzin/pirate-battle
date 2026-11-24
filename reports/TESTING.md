@@ -62,6 +62,12 @@ Run against the production build (`vite build` + `vite preview`), with MSW runni
 
 `profiling.perf.spec.ts` is excluded from the normal run. `npm run perf`, `npm run perf:gpu` and `npm run perf:mobile` run it; see [PERFORMANCE.md](PERFORMANCE.md).
 
+### Against the published deploy
+
+`npm run test:e2e:live` runs the same specs against https://pirate-battle-ashy.vercel.app, with no local server. The Strict Mode project is skipped, because it needs the dev server.
+
+Latest run: **96 tests (desktop and mobile)**. 95 passed on the first try. One (`02-assets`, progress) passed on retry after a single atlas download failed over the internet, and then passed 6 of 6 when repeated. The game showed its "Assets failed to load" screen with Retry, as designed.
+
 ### Determinism
 
 - `?seed=` fixes the match RNG.

@@ -4,7 +4,7 @@ A top-down 2D naval shooter built with **React**, **TypeScript (strict)** and **
 
 The ranking and match history use REST APIs that are mocked with **MSW**. The client calls them through **Axios** and **TanStack Query**. The mocks also run in the deployed build.
 
-- Live demo: _URL added after the first Vercel deploy (see [Deployment](#deployment))_
+- **Live demo: https://pirate-battle-ashy.vercel.app** (Vercel, mocks included)
 - Architecture and decisions: [ARCHITECTURE.md](ARCHITECTURE.md)
 - Requirement-by-requirement checklist: [REQUIREMENTS.md](REQUIREMENTS.md)
 - Test and profiling reports: [`reports/`](reports) ([test report](reports/TESTING.md), [performance](reports/PERFORMANCE.md))
@@ -35,6 +35,7 @@ None are required. The game runs fully in the browser and the backend is MSW. Th
 | `npm test` | Vitest unit and integration tests (rules, API, mocks, outbox, input, storage) |
 | `npm run test:coverage` | Same tests with V8 coverage (fails under 80 %; HTML in `reports/coverage/`) |
 | `npm run test:e2e` | Playwright E2E tests on desktop and mobile Chromium, against the production build |
+| `npm run test:e2e:live` | The same E2E suite against the published deploy (`LIVE_URL` overrides the address) |
 | `npm run test:e2e:update` | Re-records the visual-regression baselines |
 | `npm run perf` | Combat and memory profiling with CPU (SwiftShader) WebGL, the worst case (writes `reports/perf/*-software.json`) |
 | `npm run perf:gpu` | Same profiling on the machine's GPU (writes `reports/perf/*-gpu.json`) |
@@ -50,7 +51,7 @@ The Playwright HTML report is written to `reports/playwright/` (open it with `np
 
 The game is a static site, and its API is mocked by MSW in the browser (also in production), so it needs no server or environment variables.
 
-- **Vercel** (used for the live demo): import the repository, or run `npx vercel --prod`. [`vercel.json`](vercel.json) sets the build command (`npm run build`), the output directory (`dist`) and `no-cache` headers for `index.html` and the MSW service worker, so a new deploy is picked up on reload.
+- **Vercel** (used for the live demo, https://pirate-battle-ashy.vercel.app): import the repository, or run `npx vercel --prod`. [`vercel.json`](vercel.json) sets the build command (`npm run build`), the output directory (`dist`) and `no-cache` headers for `index.html` and the MSW service worker, so a new deploy is picked up on reload.
 - **Netlify or Cloudflare Pages**: build command `npm run build`, output directory `dist`.
 - Asset and API URLs follow Vite's `base`, so a sub-path deploy also works: `npm run build -- --base=/my/path/`.
 
